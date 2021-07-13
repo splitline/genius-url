@@ -1,5 +1,5 @@
 from types import CodeType, FunctionType
-
+from functools import wraps
 
 class URLComponent(object):
     def __init__(self, first_part='/'):
@@ -27,7 +27,7 @@ class URLComponent(object):
         return object.__getattribute__(self, name)
 
 
-def genius_url(f: FunctionType):
+def genius_url(old_func: FunctionType):
     class FakeGlobals(dict):
         def __init__(self, d):
             self.update(d)
@@ -36,10 +36,14 @@ def genius_url(f: FunctionType):
             if key not in self:
                 if key in self['__builtins__'].__dict__:
                     return self['__builtins__'].__dict__[key]
-                self[key] = URLComponent(key)
-                return self[key]
+                return URLComponent(key)
             return dict.__getitem__(self, key)
 
-    return FunctionType(f.__code__,
-                        FakeGlobals(f.__globals__),
-                        f.__name__, f.__defaults__)
+    @wraps(old_func)
+    def wrapper(*args, **kwds):
+        new_function = FunctionType(old_func.__code__,
+                                    FakeGlobals(old_func.__globals__),
+                                    old_func.__name__, old_func.__defaults__)
+        return new_function()
+
+    return wrapper
