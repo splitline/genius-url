@@ -1,30 +1,34 @@
 from types import CodeType, FunctionType
 from functools import wraps
 
+
 class URLComponent(object):
     def __init__(self, first_part='/'):
-        self.parts = [first_part]
+        self.__parts = [first_part]
 
-    def request(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs):
         import requests
         url = str(self)
-        return requests.request(url=url, *args, **kwargs)
+        kwargs.setdefault('method', 'GET')
+        return requests.request(url=str(self), *args, **kwargs)
 
     def __str__(self):
-        return "http://" + '/'.join(self.parts)
+        return "http://" + '/'.join(self.__parts)
 
     def __truediv__(self, path):
         if type(path) == str:
-            self.parts.append(path)
+            self.__parts.append(path)
         elif type(path) == URLComponent:
-            self.parts.append('/'.join(path.parts))
+            self.__parts.append('/'.join(path.__parts))
         return self
 
     def __getattribute__(self, name):
-        if name not in ['parts', 'request']:
-            self.parts[-1] += f".{name}"
+        try:
+            if object.__getattribute__(self, name):
+                return object.__getattribute__(self, name)
+        except AttributeError:
+            self.__parts[-1] += f".{name}"
             return self
-        return object.__getattribute__(self, name)
 
 
 def genius_url(old_func: FunctionType):
