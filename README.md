@@ -1,7 +1,7 @@
 # genius-url
 A URL builder for genius :D
 
-![](cover.svg)
+![](cover.svg?v=1)
 
 ## Usage
 ```
