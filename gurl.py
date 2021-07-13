@@ -47,7 +47,7 @@ def genius_url(old_func: FunctionType):
     def wrapper(*args, **kwds):
         new_function = FunctionType(old_func.__code__,
                                     FakeGlobals(old_func.__globals__),
-                                    old_func.__name__, old_func.__defaults__)
+                                    old_func.__name__, old_func.__defaults__, old_func.__closure__)
         return new_function()
 
     return wrapper
