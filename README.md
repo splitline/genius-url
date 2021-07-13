@@ -1,6 +1,8 @@
 # genius-url
 A URL builder for genius :D
 
+![](cover.svg)
+
 ## Usage
 ```
 from gurl import genius_url
